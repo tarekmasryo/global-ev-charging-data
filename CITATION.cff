@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+title: "Global EV Infra Dataset (2025)"
+type: dataset
+authors:
+  - family-names: "Masryo"
+    given-names: "Tarek"
+repository-code: "https://github.com/tarekmasryo/global-ev-infra-dataset"
+url: "https://github.com/tarekmasryo/global-ev-infra-dataset"
+license: "CC-BY-4.0"
+date-released: "2025-09-01"
+keywords:
+  - "electric vehicles"
+  - "charging stations"
+  - "infrastructure"

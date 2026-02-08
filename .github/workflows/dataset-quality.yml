@@ -34,6 +34,6 @@ jobs:
         run: |
           python scripts/build_views.py --data-dir data --out-dir generated
 
-      - name: Write checksums
+      - name: Verify checksums
         run: |
-          python scripts/write_checksums.py --root . --out checksums.sha256
+          python scripts/make_checksums.py --check

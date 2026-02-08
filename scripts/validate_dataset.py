@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -147,6 +148,17 @@ def validate(data_dir: Path, strict: bool) -> None:
     _assert_nonneg(stations["ports"], f"{stations_path.name}.ports", strict)
     _assert_nonneg(stations["power_kw"], f"{stations_path.name}.power_kw", strict)
 
+    # Derived flag sanity: is_fast_dc should align with power_kw>=50
+    is_fast = _bool_like(stations["is_fast_dc"])
+    power_fast = pd.to_numeric(stations["power_kw"], errors="coerce") >= 50
+    mismatch = (is_fast.notna()) & (power_fast.notna()) & (is_fast != power_fast)
+    if int(mismatch.sum()) != 0:
+        _warn(
+            f"{stations_path.name}.is_fast_dc: mismatch with power_kw>=50 for "
+            f"{int(mismatch.sum())} rows",
+            strict,
+        )
+
     # power_class sanity
     pc = stations["power_class"].astype(str).str.strip().str.lower()
     allowed = {"slow", "fast", "hpc"}
@@ -190,3 +202,28 @@ def validate(data_dir: Path, strict: bool) -> None:
                         f"from computed station counts. Sample: {sample}"
                     )
                     _warn(msg, strict)
+
+    print("✅ Dataset validation passed.")
+
+
+def parse_args() -> tuple[Path, bool]:
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--data-dir",
+        type=Path,
+        default=Path("data"),
+        help="Directory containing data files.",
+    )
+    ap.add_argument("--strict", action="store_true", help="Fail on warnings.")
+    args = ap.parse_args()
+    return args.data_dir, bool(args.strict)
+
+
+def main() -> int:
+    data_dir, strict = parse_args()
+    validate(data_dir=data_dir, strict=strict)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
